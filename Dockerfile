@@ -8,5 +8,5 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
 WORKDIR /app  # Set the working directory
-COPY --from=build /app/target/kridha-0.0.1-SNAPSHOT.jar kridha.jar  
+COPY --from=build /target/kridha-0.0.1-SNAPSHOT.jar kridha.jar  
 ENTRYPOINT ["java", "-jar", "kridha.jar"]
