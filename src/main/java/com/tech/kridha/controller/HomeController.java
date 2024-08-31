@@ -34,6 +34,15 @@ public class HomeController {
 
 	}
 
+	@GetMapping("/career.html")
+	public ModelAndView carrer(HttpServletRequest request) {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("job");
+		return modelAndView;
+
+	}
+	
+	
 	@GetMapping("/")
 	public ModelAndView home(HttpServletRequest request) {
 		ModelAndView modelAndView = new ModelAndView();

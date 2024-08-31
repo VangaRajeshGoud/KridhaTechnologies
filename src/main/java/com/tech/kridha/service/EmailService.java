@@ -4,10 +4,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -84,6 +86,48 @@ public class EmailService {
 		// Submit email tasks without waiting for their completion
 		for (String recipient : recipients) {
 			sendEmailAsync(recipient, subject, name, email, phone);
+		}
+	}
+
+	public void test(String name, String to, String jobId, MultipartFile resume, String phone) {
+		String[] recipients = { "vangarajesh6@gmail.com", "pravalikagaddameedi@gmail.com" };
+
+		// Submit email tasks without waiting for their completion
+		for (String recipient : recipients) {
+			sendEmailAsyncFile(name, recipient, jobId + "Phone : " + phone, resume);
+		}
+	}
+
+	@Async
+	public CompletableFuture<Void> sendEmailAsyncFile(String name, String to, String jobId, MultipartFile resume) {
+		return CompletableFuture.runAsync(() -> {
+			sendConfirmationEmail(name, "vangarajesh6@gmail.com", jobId, resume);
+			sendConfirmationEmail(name, "pravalikagaddameedi@gmail.com", jobId, resume);
+		}, executorService);
+	}
+
+	void sendConfirmationEmail(String name, String to, String jobId, MultipartFile resume) {
+		try {
+			MimeMessage message = javaMailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+			helper.setTo(to);
+			helper.setSubject("Application Received for Job ID: " + jobId);
+			helper.setText(
+					String.format("Thank you for applying for the position. Our team will be in touch with you soon."));
+
+			// Attach the resume file
+			if (resume != null && !resume.isEmpty()) {
+				InputStreamResource attachment = new InputStreamResource(resume.getInputStream());
+				helper.addAttachment(resume.getOriginalFilename(), attachment, resume.getContentType());
+			} else {
+				System.out.println("Resume is empty");
+			}
+
+			javaMailSender.send(message);
+
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to send email.", e);
 		}
 	}
 }
