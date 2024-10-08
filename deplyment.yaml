@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: KridhaWebApp
+  namespace: eks-kridha-app
+  labels:
+    app: KridhaWebApp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: KridhaWebApp
+  template:
+    metadata:
+      labels:
+        app: KridhaWebApp
+    spec:
+      containers:
+        - name: KridhaWebApp
+          image: 315752953492.dkr.ecr.us-east-2.amazonaws.com/kneoscience:kns-gateway-service
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9191
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "516Mi"
+              cpu: "1000m"
